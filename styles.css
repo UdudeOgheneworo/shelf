@@ -1,0 +1,95 @@
+* {
+  margin: 0%;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+header,
+main,
+footer {
+  width: clamp(300px, 50vw, 400px);
+}
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+header h1 {
+  text-transform: capitalize;
+}
+header h1 span {
+  text-transform: capitalize;
+  color: rgb(81, 94, 167);
+}
+header form input {
+  outline: none;
+  border: 1px solid rgb(78, 77, 77);
+  padding: 5px;
+  border-radius: 0.4rem;
+  width: 10rem;
+}
+main form {
+  display: flex;
+  flex-direction: column;
+}
+main form label {
+  text-transform: capitalize;
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+main form input {
+  width: 100%;
+  outline: none;
+  height: 1.5rem;
+  padding: 0.3rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.4rem;
+  border: 1px solid rgb(97, 97, 97);
+}
+main form div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+main form div button {
+  box-sizing: initial;
+  width: 6rem;
+  font-size: 1.2rem;
+  text-transform: capitalize;
+  padding: 0.2em 0.3em;
+  background-color: rgb(81, 94, 167);
+  border-radius: 0.4rem;
+}
+footer table {
+  width: 100%;
+  text-transform: capitalize;
+  text-align: center;
+  font-size: 1.1rem;
+}
+.notification h4 {
+  width: 300px;
+  color: white;
+  background-color: red;
+  position: absolute;
+  right: calc(50% - 150px);
+  z-index: 100;
+  text-transform: capitalize;
+  padding: 0.3em;
+  border-radius: 1rem;
+}
+tr:nth-of-type(even),
+thead {
+  background-color: rgba(0, 0, 255, 0.61);
+}
+tr:last-child {
+  width: 10%;
+}
+td {
+  padding: 10px 5px;
+}
