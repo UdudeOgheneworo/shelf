@@ -5,48 +5,47 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>shelf</title>
+    <title>bookShelf</title>
     <script src="https://kit.fontawesome.com/80697a080e.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="./styles.css">
 </head>
 
 <body>
-    <div class="notification">
+    <div class="container">
 
+        <header>
+            <h1>Book<span>Shelf</span></h1>
+            <form id="searchBook" autocomplete="off">
+                <input type="text" id="searchInput" placeholder="search book">
+            </form>
+        </header>
+        <main>
+            <form id="bookDetails" autocomplete="off">
+                <label for="title">Title</label>
+                <input type="text" name="title" id="title">
+                <label for="author">Author</label>
+                <input type="text" name="author" id="author">
+                <label for="isbn">isbn</label>
+                <input type="text" name="isbn" id="isbn">
+                <button type="submit">submit</button>
+            </form>
+        </main>
+        <footer>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>ISBN</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </footer>
     </div>
-    <header>
-        <h1>the<span>shelf</span></h1>
-
-    </header>
-    <main>
-        <form class="form">
-            <label for="title">title</label>
-            <input type="text" name="title" id="title">
-            <label for="author">author</label>
-            <input type="text" name="author" id="author">
-            <label for="isbn">isbn</label>
-            <input type="text" name="isbn" id="isbn">
-            <div>
-                <button type="submit" class="submit">add book</button>
-                <p>books: <Span class="bookNo">0</Span></p>
-            </div>
-        </form>
-    </main>
-    <footer>
-        <table>
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>ISBN</th>
-                    <th>delete</th>
-                </tr>
-            </thead>
-            <tbody class="tableBody">
-
-            </tbody>
-        </table>
-    </footer>
 
 
     <script src="./app.js"></script>

@@ -5,89 +5,173 @@ class Book {
     this.isbn = isbn;
   }
 }
-const tableBody = document.querySelector(".tableBody");
-let storeBook = [];
+
+const bookDetails = document.querySelector("#bookDetails");
+const table = document.querySelector("table");
+const tableBody = document.querySelector("tbody");
+const footer = document.querySelector("footer");
+let storedBooks = [];
 
 class UI {
-  static saveBook(book) {
-    storeBook.push(book);
-    const save = JSON.stringify(storeBook);
-    localStorage.setItem("storeBook", save);
+  static storeBook(book) {
+    storedBooks.push(book);
+    let bookStore = JSON.stringify(storedBooks);
+    localStorage.setItem("storedBooks", bookStore);
   }
+
   static displayBookOnload() {
-    storeBook = JSON.parse(localStorage.getItem("storeBook"));
-    for (let i = 0; i < storeBook.length; i++) {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${storeBook[i].title}</td>
-        <td>${storeBook[i].author}</td>
-        <td class = "isbn">${storeBook[i].isbn}</td>
-        <td><i class="fa-solid fa-trash"></i></td>
-      `;
-      tableBody.appendChild(row);
+    const retrievedBooks = JSON.parse(localStorage.getItem("storedBooks"));
+    if (!retrievedBooks) return;
+    storedBooks = retrievedBooks;
+
+    for (let i = 0; i < storedBooks.length; i++) {
+      this.displayBook(storedBooks[i]);
     }
   }
+
   static displayBook(book) {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-    <td>${book.title}</td>
-    <td>${book.author}</td>
-    <td class = "isbn">${book.isbn}</td>
-    <td><i class="fa-solid fa-trash"></i></td>
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+        <td> ${book.title} </td>
+        <td> ${book.author} </td>
+        <td> ${book.isbn} </td>
+        <td> <i class="fa-solid fa-circle-minus"></i> </td>
+      `;
+    tableBody.appendChild(tr);
+  }
+
+  static deleteBook(bookIndex) {
+    storedBooks.splice(bookIndex, 1);
+    let bookStore = JSON.stringify(storedBooks);
+    localStorage.setItem("storedBooks", bookStore);
+  }
+}
+
+window.addEventListener("DOMContentLoaded", UI.displayBookOnload());
+
+function warning(message, location) {
+  const div = document.createElement("div");
+  div.className = "warning";
+  div.innerHTML = `
+        <i class="fa-solid fa-circle-exclamation"></i> ${message}
     `;
-    tableBody.appendChild(row);
-  }
-  static deleteBook(target, index) {
-    tableBody.removeChild(target);
-    storeBook = JSON.parse(localStorage.getItem("storeBook"));
-    storeBook.splice(index, 1);
-    const save = JSON.stringify(storeBook);
-    localStorage.setItem("storeBook", save);
-  }
+  location.after(div);
 }
 
-window.addEventListener("DOMcontentLoaded", UI.displayBookOnload());
-
-const submit = document.querySelector(".submit");
-const form = document.querySelector(".form");
-
-const titleInput = form.querySelector("#title");
-const authorInput = form.querySelector("#author");
-const isbnInput = form.querySelector("#isbn");
-let trash;
-
-function notification() {
-  const notify = document.querySelector(".notification");
-  const p = document.createElement("h4");
-  p.innerText =
-    "title and author name has to be filled and isbn should be a number";
-  notify.append(p);
-  setTimeout(() => {
-    notify.removeChild(document.querySelector("h4"));
-  }, 1000);
-}
-
-form.addEventListener("submit", (e) => {
+bookDetails.addEventListener("submit", (e) => {
   e.preventDefault();
-  if (!titleInput.value || !authorInput.value || !isbnInput.value) {
-    notification();
+  const titleInput = bookDetails.querySelector("#title");
+  const authorInput = bookDetails.querySelector("#author");
+  const isbnInput = bookDetails.querySelector("#isbn");
+  let title = titleInput.value.toLowerCase();
+  let author = authorInput.value.toLowerCase();
+  let isbn = parseInt(isbnInput.value);
+
+  resetTableRow();
+
+  // deleting previous validation messages
+  const warnings = [...bookDetails.querySelectorAll("div")];
+  for (warn of warnings) {
+    warn.remove();
+  }
+
+  // validation of form input
+  if (!author || !title || isNaN(isbn)) {
+    if (!author) {
+      warning("input the author of the book", authorInput);
+    }
+    if (!title) {
+      warning("input the title of the book", titleInput);
+    }
+    if (isNaN(isbn)) {
+      warning("isbn must be a number", isbnInput);
+    }
     return;
   }
-  title = titleInput.value;
-  author = authorInput.value;
-  isbn = isbnInput.value;
+
+  //fill in table
   const book = new Book(title, author, isbn);
-  UI.saveBook(book);
+  UI.storeBook(book);
   UI.displayBook(book);
+
   titleInput.value = "";
   authorInput.value = "";
   isbnInput.value = "";
 });
 
 tableBody.addEventListener("click", (e) => {
-  if (!e.target.classList.contains("fa-trash")) return;
-  const tableBodyRows = [...tableBody.querySelectorAll("tr")];
-  const target = e.target.parentElement.parentElement;
-  const index = tableBodyRows.indexOf(target);
-  UI.deleteBook(target, index);
+  const trash = [...tableBody.querySelectorAll(".fa-circle-minus")];
+  if (e.target.classList.contains("fa-circle-minus")) {
+    const index = trash.indexOf(e.target);
+    const bookRow = e.target.parentElement.parentElement;
+    tableBody.removeChild(bookRow);
+    UI.deleteBook(index);
+  }
+});
+
+const searchBooks = document.querySelector("#searchBook");
+
+function searchBookStore(search) {
+  let searchIndex = [];
+  for (let i = 0; i < storedBooks.length; i++) {
+    for (el in storedBooks[i]) {
+      if (String(storedBooks[i][el]).includes(search)) {
+        searchIndex.push(i);
+      }
+    }
+  }
+  searchIndex = searchIndex.filter(
+    (item, index, arr) => arr.indexOf(item) == index
+  );
+  return searchIndex;
+}
+
+function displayResultInfo(arr, search) {
+  const resultRow = document.createElement("div");
+  resultRow.className = "resultRow";
+  resultRow.innerHTML = `
+    <p> search input: ${search} </p>
+    <p> results: ${arr.length} </p>
+    <button class= "cancel" > x </button>
+  `;
+  table.before(resultRow);
+}
+
+function sortResult(arr, tableRows) {
+  for (el of tableRows) {
+    el.style.display = "none";
+  }
+  for (let i = 0; i < arr.length; i++) {
+    tableRows[arr[i]].style.display = "table-row";
+  }
+}
+
+function resetTableRow() {
+  const tableRows = [...tableBody.querySelectorAll("tr")];
+  const resultRow = footer.querySelector(".resultRow");
+  if (resultRow) {
+    footer.removeChild(resultRow);
+  }
+  for (el of tableRows) {
+    el.style.display = "table-row";
+  }
+}
+
+searchBooks.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const tableRows = [...tableBody.querySelectorAll("tr")];
+  const searchInput = searchBooks.querySelector("#searchInput");
+  const search = searchInput.value.toLowerCase();
+  resetTableRow();
+  if (!searchInput.value) return;
+  let indexArray = searchBookStore(search);
+  displayResultInfo(indexArray, search);
+  sortResult(indexArray, tableRows);
+  searchInput.value = "";
+});
+
+footer.addEventListener("click", (e) => {
+  if (e.target.classList.contains("cancel")) {
+    resetTableRow();
+  }
 });
